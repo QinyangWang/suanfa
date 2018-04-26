@@ -1,0 +1,82 @@
+#include<iostream>
+#include<utility>
+#include<queue>
+#include<cstdio>
+#define MAX_N 105
+#define MAX_M 105
+using namespace std;
+const int D = -1;
+typedef pair<int, int>T;//返回一个pair,带两个值 
+char a[MAX_N][MAX_M+1]; //表示迷宫的字符串数组 
+int N,M;
+int bfs(int sx,int sy,int gx,int gy)//求从(sx,sy)到(gx,gy)的最短距离，若无法到达则是D
+{
+    int d[MAX_N][MAX_M]; //到各个位置最短距离的数组 
+    int dx[4] = {1,0,-1,0}, dy[4] = { 0,1,0,-1}; //4个方向移动的量 
+    queue<T>que;
+    for (int i = 0;i < N;i++)
+    {
+        for (int j = 0;j < M;j++)
+        {
+            d[i][j] = D; //所有位置初始化为D 
+        }
+    }
+    
+    que.push(T(sx,sy));// 将起点加入队列中 
+    d[sx][sy] = 0;  //起点压入队列，并把这点距离设置为0 
+    
+    while (que.size())//判断que中是否还有元素，不断循环直到队列的长度为0 
+    { 
+        T p = que.front();//从队列的最前段取出元素 
+        que.pop();//取出后从队列中删除该元素 
+        
+        if (p.first == gx && p.second == gy)
+        {
+            break; //取出的状态为终点，结束搜索 
+        }
+        
+        for (int i = 0; i < 4;i++) //四个方向循环 
+        {
+            int nx = p.first + dx[i],ny = p.second + dy[i];//移动后的位置标记为(nx,ny) 
+            
+            if (0 <= nx && nx < N && 0 <= ny && ny < M && a[nx][ny] != '#' && d[nx][ny] == D)//判断是否可以移动以及是否访问过(即d[nx][ny]!=D) 
+            {
+                que.push(T(nx,ny));  //可以移动则加入队列，并更新该位置距离 
+                d[nx][ny] = d[p.first][p.second] + 1;//到该位置的距离为到p的距离+1 
+            }
+        }
+    }
+    return d[gx][gy];
+}
+
+
+int main()
+{
+    int i,j,result;
+    int sx,sy;  //起点坐标
+    int gx,gy;  //终点坐标
+    scanf("%d %d",&N,&M);
+    for (i=0;i<N;i++)
+    {    
+        cin>>a[i];
+    }
+    for (i=0;i<N;i++)
+    {
+        for (j=0;j<M;j++)
+        {
+            if (a[i][j] == '@') 
+            {
+                sx = i;
+                sy = j;
+            }
+            if (a[i][j] == '$')
+            {
+                gx = i;
+                gy = j;
+            }
+        } 
+    }
+    result = bfs(sx,sy,gx,gy);
+    printf("%d\n",result);
+    return 0;
+} 
